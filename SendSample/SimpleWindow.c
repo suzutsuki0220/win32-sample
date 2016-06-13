@@ -3,10 +3,11 @@
 
 #include "my_fieldid.h"
 #include "send_packet.h"
+#include "MyWindow.h"
 
 // 定数
 #define WINDOW_WIDTH (500) // ウィンドウの幅
-#define WINDOW_HEIGHT (400) // ウィンドウの高さ
+#define WINDOW_HEIGHT (600) // ウィンドウの高さ
 #define WINDOW_X ((GetSystemMetrics( SM_CXSCREEN ) - WINDOW_WIDTH ) / 2)
 #define WINDOW_Y ((GetSystemMetrics( SM_CYSCREEN ) - WINDOW_HEIGHT ) / 2)
 
@@ -30,7 +31,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR pCmdLine, int sho
 
     // ウィンドウを作成する
     hWnd = Create( hInst );
-    if(hWnd == NULL)
+    if (hWnd == NULL)
     {
         MessageBox(NULL, _T("ウィンドウの作成に失敗しました"), _T("エラー"), MB_OK);
         return 1;
@@ -38,30 +39,38 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR pCmdLine, int sho
 
     // ボタン
     HWND hwnd_button = CreateWindow("button","送信",WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON, 50,50,70,30,hWnd,(HMENU)10000,hInst,NULL);
-    if(hwnd_button == NULL)
+    if (hwnd_button == NULL)
     {
         MessageBox(NULL, _T("ウィンドウの作成に失敗しました"), _T("エラー"), MB_OK);
         return 1;
     }
 
-        // 接続先入力欄 (EDIT)
-        CreateWindow(
-			TEXT("EDIT"), TEXT("192.168.32.72"), 
-			WS_CHILD | WS_VISIBLE | WS_BORDER | ES_LEFT,
-			0 , 0 , 200 , 30 , hWnd , (HMENU)FIELD_ID_HOST,
-			hInst, NULL
-			);
-	// レスポンス表示欄 (EDIT)
-        CreateWindow(
-			TEXT("EDIT"), _T(""), 
-			WS_CHILD | WS_VISIBLE | WS_BORDER | ES_LEFT | ES_MULTILINE | WS_HSCROLL | WS_VSCROLL | ES_AUTOHSCROLL | ES_AUTOVSCROLL,
-			0, 100, 400, 200, hWnd, (HMENU)FIELD_ID_RESP,
-			hInst, NULL
-			);
+    // 接続先入力欄 (EDIT)
+    CreateWindow(
+        _T("EDIT"), _T("192.168.32.72"), 
+        WS_CHILD | WS_VISIBLE | WS_BORDER | ES_LEFT,
+        0, 0, 200, 30, hWnd, (HMENU)FIELD_ID_HOST,
+        hInst, NULL
+    );
+
+    // リクエスト入力欄 (EDIT)
+    CreateWindow(
+        _T("EDIT"), _T("HEAD / HTTP1.0\r\n\r\n"), 
+        WS_CHILD | WS_VISIBLE | WS_BORDER | ES_LEFT | ES_MULTILINE | WS_HSCROLL | WS_VSCROLL | ES_AUTOHSCROLL | ES_AUTOVSCROLL,
+        0, 100, 400, 200, hWnd, (HMENU)FIELD_ID_REQ,
+        hInst, NULL
+    );
+    // レスポンス表示欄 (EDIT)
+    CreateWindow(
+        _T("EDIT"), _T(""), 
+        WS_CHILD | WS_VISIBLE | WS_BORDER | ES_LEFT | ES_MULTILINE | WS_HSCROLL | WS_VSCROLL | ES_AUTOHSCROLL | ES_AUTOVSCROLL,
+        0, 400, 400, 200, hWnd, (HMENU)FIELD_ID_RESP,
+        hInst, NULL
+    );
 
     // ウィンドウを表示する
-    ShowWindow( hWnd, SW_SHOW );
-    UpdateWindow( hWnd );
+    ShowWindow(hWnd, SW_SHOW);
+    UpdateWindow(hWnd);
 
     // メッセージループ
     while( 1 )
@@ -134,12 +143,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
     static HMENU hMenu;
     int wmId;
 
-    char message[] = "HEAD / HTTP/1.0\r\n\r\n";
     char response[1024];
 
-    HDC hdc;
     LPSTR strHost = NULL;
     size_t strHostLen = 0;
+    LPSTR strReq = NULL;
+    size_t strReqLen = 0;
 
     switch( msg )
     {
@@ -151,12 +160,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
         return 0;
     case WM_KEYDOWN:
-        //デバイスコンテキスト取得
-        hdc = GetDC(hWnd);
-        //描画
-        TextOut(hdc,0,0,_T("テストですよ"), strlen("テストですよ"));
-        //必ず解放
-        ReleaseDC(hWnd,hdc);
+        drawText(hWnd, 0, 0, "文字を表示");
         return 0;
     case WM_COMMAND:
         wmId= LOWORD(wp);
@@ -168,10 +172,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
             // ボタン押下
             strHostLen = GetWindowTextLength(GetDlgItem(hWnd, FIELD_ID_HOST)) + 2;
             strHost = malloc(strHostLen);
-            if (strHost) {
+            strReqLen = GetWindowTextLength(GetDlgItem(hWnd, FIELD_ID_REQ)) + 2;
+            strReq = malloc(strReqLen);
+            if (strHost && strReq) {
                 GetWindowText(GetDlgItem(hWnd, FIELD_ID_HOST), strHost, strHostLen);
+                GetWindowText(GetDlgItem(hWnd, FIELD_ID_REQ), strReq, strReqLen);
                 memset(response, '\0', sizeof(response));
-                send_packet(strHost, message, response, sizeof(response));
+                send_packet(strHost, (char*)strReq, response, sizeof(response));
                 //MessageBoxA(NULL, strHost, _T("result"), MB_OK);  // マルチバイト文字を受けるMessageBoxA
                 SetWindowText(GetDlgItem(hWnd, FIELD_ID_RESP), _T(response));
                 free(strHost);
@@ -184,6 +191,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
         default:
              break;
         }
+        break;
+
+    case WM_PAINT:
+        drawText(hWnd, 0, 55, "接続先");
+        drawText(hWnd, 0, 70, "リクエスト");
+
+        // リクエスト入力欄のサイズ変更
+        resizeReqBox(hWnd);
+
         break;
 
     case WM_CLOSE: // ウィンドウが閉じられるとき

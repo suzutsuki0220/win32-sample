@@ -1,5 +1,5 @@
 PROG=SimpleWindow.exe
-SRC=SimpleWindow.c send_packet.c
+SRC=SimpleWindow.c send_packet.c MyWindow.c
 OBJS=$(SRC:.c=.o)
 RC=menu.rc
 WINDRES=$(RC:.rc=.o)
