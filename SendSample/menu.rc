@@ -1,7 +1,7 @@
 WIN_MENU MENU {
     POPUP "ファイル" {
-    MENUITEM "開く" , 40001
-    POPUP "サブ" {
+        MENUITEM "開く" , 40001
+        POPUP "サブ" {
             MENUITEM "ブー" , 40002
             MENUITEM "フー" , 40003
             MENUITEM "ウー" , 40004
