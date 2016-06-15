@@ -61,10 +61,10 @@ resizeReqBox(HWND hWnd)
 
     SetWindowPos(GetDlgItem(hWnd, FIELD_ID_REQ), 0, 0, top_area_height, xx, box_height, SWP_NOACTIVATE | SWP_NOZORDER);
     SetWindowPos(GetDlgItem(hWnd, FIELD_ID_BTN_SOUSHIN), 0, xx/2-35, top_area_height+box_height+middle_area_height-35, 70, 30, SWP_NOACTIVATE | SWP_NOZORDER);
-    SetWindowPos(GetDlgItem(hWnd, FIELD_ID_CONTENT), 0, 80, top_area_height+box_height+5, xx-80, 30, SWP_NOACTIVATE | SWP_NOZORDER);
+//    SetWindowPos(GetDlgItem(hWnd, FIELD_ID_CONTENT), 0, 80, top_area_height+box_height+5, xx-80, 30, SWP_NOACTIVATE | SWP_NOZORDER);
     SetWindowPos(GetDlgItem(hWnd, FIELD_ID_RESP), 0, 0, top_area_height+box_height+middle_area_height, xx, box_height, SWP_NOACTIVATE | SWP_NOZORDER);
 
     drawText(hWnd, 0, 5, "接続先");
     drawText(hWnd, 0, 40, "リクエスト");
-    drawText(hWnd, 0, 70+box_height+10, "Query");
+//    drawText(hWnd, 0, 70+box_height+10, "Query");
 }

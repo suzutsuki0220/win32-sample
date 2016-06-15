@@ -68,12 +68,12 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR pCmdLine, int sho
         hInst, NULL
     );
     // Content入力欄 (EDIT)
-    CreateWindow(
-        _T("EDIT"), _T(""), 
-        WS_CHILD | WS_VISIBLE | WS_BORDER | ES_LEFT,
-        80, 360, 350, 30, hWnd, (HMENU)FIELD_ID_CONTENT,
-        hInst, NULL
-    );
+//    CreateWindow(
+//        _T("EDIT"), _T(""), 
+//        WS_CHILD | WS_VISIBLE | WS_BORDER | ES_LEFT,
+//        80, 360, 350, 30, hWnd, (HMENU)FIELD_ID_CONTENT,
+//        hInst, NULL
+//    );
 
     // ウィンドウを表示する
     ShowWindow(hWnd, SW_SHOW);
